@@ -5,8 +5,7 @@
  */
 package common.WebProject.repository;
 
-
-import common.WebProject.model.Poll;
+import common.WebProject.model.Book;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -16,14 +15,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PollRepository extends JpaRepository<Poll, Long> {
-    Optional<Poll> findById(Long pollId);
+public interface BookRepository extends JpaRepository<Book, Long> {
+    Optional<Book> findById(Long bookId);
 
-    Page<Poll> findByCreatedBy(Long userId, Pageable pageable);
+    Page<Book> findByCreatedBy(Long userId, Pageable pageable);
 
     long countByCreatedBy(Long userId);
 
-    List<Poll> findByIdIn(List<Long> pollIds);
+    List<Book> findByIdIn(List<Long> bookIds);
 
-    List<Poll> findByIdIn(List<Long> pollIds, Sort sort);
+    List<Book> findByIdIn(List<Long> bookIds, Sort sort);
 }

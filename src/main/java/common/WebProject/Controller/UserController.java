@@ -6,22 +6,18 @@
 package common.WebProject.Controller;
 
 import common.WebProject.Exception.ResourceNotFoundException;
+import common.WebProject.Payload.BookResponse;
 import common.WebProject.Payload.PagedResponse;
-import common.WebProject.Payload.PollResponse;
 import common.WebProject.Payload.UserIdentityAvailability;
 import common.WebProject.Payload.UserProfile;
 import common.WebProject.Payload.UserSummary;
 import common.WebProject.Security.CurrentUser;
 import common.WebProject.Security.UserPrincipal;
-import common.WebProject.Service.IUserService;
-import common.WebProject.Service.PollService;
-import java.util.Collection;
+import common.WebProject.Service.BookService;
 import common.WebProject.model.User;
-import common.WebProject.repository.PollRepository;
+import common.WebProject.repository.BookRepository;
 import common.WebProject.repository.UserRepository;
-import common.WebProject.repository.VoteRepository;
 import common.WebProject.util.AppConstants;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -39,14 +35,12 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
+    
     @Autowired
-    private PollRepository pollRepository;
-
+    private BookRepository bookRepository;
+    
     @Autowired
-    private VoteRepository voteRepository;
-
-    @Autowired
-    private PollService pollService;
+    private BookService bookService;
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
@@ -74,29 +68,19 @@ public class UserController {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
 
-        long pollCount = pollRepository.countByCreatedBy(user.getId());
-        long voteCount = voteRepository.countByUserId(user.getId());
-
-        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt(), pollCount, voteCount);
+        UserProfile userProfile = new UserProfile(user.getId(), user.getUsername(), user.getName(), user.getCreatedAt() );
 
         return userProfile;
     }
 
-    @GetMapping("/users/{username}/polls")
-    public PagedResponse<PollResponse> getPollsCreatedBy(@PathVariable(value = "username") String username,
+    
+    @GetMapping("/users/{username}/books")
+    public PagedResponse<BookResponse> getBooksCreatedBy(@PathVariable(value = "username") String username,
                                                          @CurrentUser UserPrincipal currentUser,
                                                          @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
                                                          @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsCreatedBy(username, currentUser, page, size);
+        return bookService.getBooksCreatedBy(username, currentUser, page, size);
     }
 
-
-    @GetMapping("/users/{username}/votes")
-    public PagedResponse<PollResponse> getPollsVotedBy(@PathVariable(value = "username") String username,
-                                                       @CurrentUser UserPrincipal currentUser,
-                                                       @RequestParam(value = "page", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER) int page,
-                                                       @RequestParam(value = "size", defaultValue = AppConstants.DEFAULT_PAGE_SIZE) int size) {
-        return pollService.getPollsVotedBy(username, currentUser, page, size);
-    }
 
 }
